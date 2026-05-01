@@ -13,6 +13,7 @@ import {
   Image,
   Settings,
   LogOut,
+  Briefcase,
 } from "lucide-react";
 
 const navItems = [
@@ -20,6 +21,7 @@ const navItems = [
   { href: "/admin/menu-items", label: "Menu Items", icon: UtensilsCrossed },
   { href: "/admin/categories", label: "Categories", icon: FolderOpen },
   { href: "/admin/packages", label: "Packages", icon: Package },
+  { href: "/admin/vendors", label: "Vendors", icon: Briefcase },
   { href: "/admin/leads", label: "Leads", icon: Users },
   { href: "/admin/banners", label: "Banners", icon: Image },
   { href: "/admin/settings", label: "Settings", icon: Settings },

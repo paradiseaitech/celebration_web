@@ -5,6 +5,9 @@ import { Hero } from "@/components/sections/hero";
 import { EventCategories } from "@/components/sections/event-categories";
 import { PlateBuilder } from "@/components/sections/plate-builder";
 import { Packages } from "@/components/sections/packages";
+import { VendorsSection } from "@/components/sections/vendors";
+import { ThemesSection } from "@/components/sections/themes";
+import { BudgetEstimator } from "@/components/sections/budget-estimator";
 import { Testimonials } from "@/components/sections/testimonials";
 import { Gallery } from "@/components/sections/gallery";
 import { About } from "@/components/sections/about";
@@ -54,10 +57,39 @@ async function getMenuItems() {
   }
 }
 
+async function getVendors() {
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("vendors")
+      .select("*")
+      .eq("is_active", true)
+      .order("is_featured", { ascending: false });
+    return data || [];
+  } catch {
+    return [];
+  }
+}
+
+async function getThemes() {
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("themes")
+      .select("*")
+      .eq("is_active", true);
+    return data || [];
+  } catch {
+    return [];
+  }
+}
+
 export default async function Home() {
-  const [categories, menuItems] = await Promise.all([
+  const [categories, menuItems, vendors, themes] = await Promise.all([
     getCategories(),
     getMenuItems(),
+    getVendors(),
+    getThemes(),
   ]);
 
   return (
@@ -68,6 +100,9 @@ export default async function Home() {
         <EventCategories />
         <PlateBuilder categories={categories} menuItems={menuItems} />
         <Packages />
+        {vendors.length > 0 && <VendorsSection vendors={vendors} />}
+        {themes.length > 0 && <ThemesSection themes={themes} />}
+        <BudgetEstimator />
         <Testimonials />
         <Gallery />
         <About />
