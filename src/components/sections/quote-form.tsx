@@ -7,6 +7,7 @@ import { z } from "zod";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { usePlateStore } from "@/store/plateStore";
 import { EVENT_TYPES } from "@/lib/constants";
 import { CheckCircle, AlertCircle } from "lucide-react";
 
@@ -25,28 +26,50 @@ type QuoteFormData = z.infer<typeof quoteSchema>;
 export function QuoteForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<"success" | "error" | null>(null);
+  const { items, guestCount, pricingMode, selectedPackageId, perPlateTotal, totalEstimate, clearPlate } = usePlateStore();
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
+    setValue,
   } = useForm<QuoteFormData>({
     resolver: zodResolver(quoteSchema),
+    defaultValues: {
+      guestCount: guestCount > 0 ? guestCount.toString() : "100",
+    },
   });
+
+  const hasPlateData = items.length > 0 || selectedPackageId;
 
   const onSubmit = async (data: QuoteFormData) => {
     setIsSubmitting(true);
     try {
+      const plateData = hasPlateData
+        ? {
+            mode: pricingMode,
+            items: pricingMode === "per-plate" ? items : null,
+            package: pricingMode === "package" ? selectedPackageId : null,
+            perPlateTotal: perPlateTotal(),
+            totalEstimate: totalEstimate(),
+          }
+        : null;
+
       const response = await fetch("/api/leads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          ...data,
+          plateData,
+          estimatedTotal: plateData?.totalEstimate || null,
+        }),
       });
 
       if (response.ok) {
         setSubmitStatus("success");
         reset();
+        clearPlate();
       } else {
         setSubmitStatus("error");
       }
@@ -99,6 +122,37 @@ export function QuoteForm() {
               <p className="text-red-700 text-sm">Please try again or call us directly.</p>
             </div>
           </motion.div>
+        )}
+
+        {hasPlateData && pricingMode === "per-plate" && (
+          <div className="bg-navy rounded-xl p-6 mb-8 text-white">
+            <h3 className="font-heading font-semibold text-gold mb-3">Your Plate Summary</h3>
+            <div className="space-y-2 mb-4">
+              {items.map((item) => (
+                <div key={item.id} className="flex justify-between text-sm text-white/70">
+                  <span>{item.name} × {item.quantity}</span>
+                  <span>₹{item.price * item.quantity}</span>
+                </div>
+              ))}
+            </div>
+            <div className="border-t border-white/20 pt-3 flex justify-between font-bold">
+              <span>
+                Total ({guestCount} guests)
+              </span>
+              <span className="text-gold">₹{totalEstimate().toLocaleString()}</span>
+            </div>
+          </div>
+        )}
+
+        {hasPlateData && pricingMode === "package" && selectedPackageId && (
+          <div className="bg-navy rounded-xl p-6 mb-8 text-white">
+            <h3 className="font-heading font-semibold text-gold mb-2">Selected Package</h3>
+            <p className="text-white/70 text-lg">{selectedPackageId} Package</p>
+            <p className="text-gold text-2xl font-bold mt-1">₹{perPlateTotal()}/plate</p>
+            <p className="text-white/50 text-sm mt-1">
+              Estimated total for {guestCount} guests: ₹{totalEstimate().toLocaleString()}
+            </p>
+          </div>
         )}
 
         <form

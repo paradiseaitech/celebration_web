@@ -49,6 +49,17 @@ const packages = [
 ];
 
 export function Packages() {
+  const handleSelect = (pkgName: string, pkgPrice: number) => {
+    const contactSection = document.getElementById("contact");
+    if (contactSection) {
+      contactSection.scrollIntoView({ behavior: "smooth" });
+    }
+    const nameInput = document.getElementById("package-name") as HTMLInputElement;
+    const messageInput = document.getElementById("message") as HTMLTextAreaElement;
+    if (nameInput) nameInput.value = pkgName;
+    if (messageInput) messageInput.value = `I'm interested in the ${pkgName} package (₹${pkgPrice}/plate). Please share more details.`;
+  };
+
   return (
     <section className="py-24 bg-cream">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -105,6 +116,7 @@ export function Packages() {
               </ul>
 
               <Button
+                onClick={() => handleSelect(pkg.name, pkg.price)}
                 className={`w-full ${
                   pkg.popular
                     ? "bg-gold text-navy hover:bg-gold-hover"
