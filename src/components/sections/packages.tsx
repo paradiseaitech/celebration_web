@@ -2,62 +2,37 @@
 
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Check, Star } from "lucide-react";
+import { usePlateStore } from "@/store/plateStore";
 
 const packages = [
   {
     name: "Silver",
     price: 350,
-    features: [
-      "3 Starters",
-      "4 Main Course",
-      "2 Desserts",
-      "2 Beverages",
-      "Basic Table Setup",
-    ],
+    features: ["3 Starters", "4 Main Course", "2 Desserts", "2 Beverages", "Basic Table Setup"],
     popular: false,
   },
   {
     name: "Gold",
     price: 550,
-    features: [
-      "5 Starters",
-      "6 Main Course",
-      "4 Desserts",
-      "3 Beverages",
-      "Premium Table Setup",
-      "Dedicated Coordinator",
-    ],
+    features: ["5 Starters", "6 Main Course", "4 Desserts", "3 Beverages", "Premium Table Setup", "Dedicated Coordinator"],
     popular: true,
   },
   {
     name: "Platinum",
     price: 850,
-    features: [
-      "8 Starters",
-      "8 Main Course",
-      "6 Desserts",
-      "4 Beverages",
-      "Live Counters",
-      "Premium Bar Setup",
-      "Event Decoration",
-      "VIP Service Staff",
-    ],
+    features: ["8 Starters", "8 Main Course", "6 Desserts", "4 Beverages", "Live Counters", "Premium Bar Setup", "Event Decoration", "VIP Service Staff"],
     popular: false,
   },
 ];
 
 export function Packages() {
   const handleSelect = (pkgName: string, pkgPrice: number) => {
-    const contactSection = document.getElementById("contact");
-    if (contactSection) {
-      contactSection.scrollIntoView({ behavior: "smooth" });
-    }
-    const nameInput = document.getElementById("package-name") as HTMLInputElement;
-    const messageInput = document.getElementById("message") as HTMLTextAreaElement;
-    if (nameInput) nameInput.value = pkgName;
-    if (messageInput) messageInput.value = `I'm interested in the ${pkgName} package (₹${pkgPrice}/plate). Please share more details.`;
+    usePlateStore.getState().clearPlate();
+    usePlateStore.getState().setPricingMode("package");
+    usePlateStore.getState().setSelectedPackageId(pkgName);
+    const contact = document.getElementById("contact");
+    if (contact) contact.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
@@ -97,9 +72,7 @@ export function Packages() {
               )}
 
               <div className="text-center mb-6">
-                <h3 className="font-heading text-2xl font-bold text-navy mb-2">
-                  {pkg.name}
-                </h3>
+                <h3 className="font-heading text-2xl font-bold text-navy mb-2">{pkg.name}</h3>
                 <div className="flex items-baseline justify-center gap-1">
                   <span className="text-4xl font-bold text-gold">₹{pkg.price}</span>
                   <span className="text-gray-500 text-sm">/plate</span>
@@ -118,9 +91,7 @@ export function Packages() {
               <Button
                 onClick={() => handleSelect(pkg.name, pkg.price)}
                 className={`w-full ${
-                  pkg.popular
-                    ? "bg-gold text-navy hover:bg-gold-hover"
-                    : "bg-navy text-white hover:bg-navy-light"
+                  pkg.popular ? "bg-gold text-navy hover:bg-gold-hover" : "bg-navy text-white hover:bg-navy-light"
                 }`}
               >
                 Select {pkg.name}
