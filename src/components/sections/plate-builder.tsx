@@ -226,19 +226,44 @@ export function PlateBuilder({ categories, menuItems }: PlateBuilderProps) {
             </button>
           </div>
 
-          <div className="flex items-center gap-3">
-            <span className="text-white/50 text-sm">Guests:</span>
-            <select
-              value={guestCount}
-              onChange={(e) => setGuestCount(Number(e.target.value))}
-              className="bg-navy-light border border-white/10 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold"
-            >
-              {GUEST_COUNTS.map((count) => (
-                <option key={count} value={count}>
-                  {count.toLocaleString()}
-                </option>
-              ))}
-            </select>
+          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 w-full sm:w-auto">
+            <div className="flex items-center gap-3 w-full sm:w-auto">
+              <span className="text-white/50 text-sm flex-shrink-0">Guests:</span>
+              <select
+                value={GUEST_COUNTS.includes(guestCount) ? guestCount : ""}
+                onChange={(e) => {
+                  const val = parseInt(e.target.value);
+                  if (val) setGuestCount(val);
+                }}
+                className="bg-navy-light border border-white/10 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold flex-1"
+              >
+                <option value="" disabled>Select</option>
+                {GUEST_COUNTS.map((count) => (
+                  <option key={count} value={count}>
+                    {count.toLocaleString()} guests
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="w-full sm:min-w-72 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-white/30 text-xs">10</span>
+                <span className="text-gold font-bold text-base">{guestCount.toLocaleString()}</span>
+                <span className="text-white/30 text-xs">5,000</span>
+              </div>
+              <input
+                type="range"
+                min={10}
+                max={5000}
+                step={10}
+                value={guestCount}
+                onChange={(e) => setGuestCount(Number(e.target.value))}
+                className="w-full h-2 rounded-full appearance-none cursor-pointer"
+                style={{
+                  background: `linear-gradient(to right, #D4A853 ${((guestCount - 10) / 4990) * 100}%, rgba(255,255,255,0.15) ${((guestCount - 10) / 4990) * 100}%)`,
+                }}
+              />
+            </div>
           </div>
         </div>
 
