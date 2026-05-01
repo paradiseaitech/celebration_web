@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { usePlateStore } from "@/store/plateStore";
 import { Button } from "@/components/ui/button";
@@ -66,16 +66,6 @@ export function PlateBuilder({ categories, menuItems }: PlateBuilderProps) {
     totalEstimate,
     itemCount,
   } = usePlateStore();
-
-  const [customGuestCount, setCustomGuestCount] = useState(guestCount > 0 ? guestCount.toString() : "100");
-
-  useEffect(() => {
-    if (!GUEST_COUNTS.includes(guestCount)) {
-      setCustomGuestCount("custom");
-    } else {
-      setCustomGuestCount(guestCount.toString());
-    }
-  }, [guestCount]);
 
   const activeCategoryName = categories.find((c) => c.slug === activeCategory)?.name || "";
 
@@ -152,45 +142,39 @@ export function PlateBuilder({ categories, menuItems }: PlateBuilderProps) {
             <div className="flex items-center gap-3">
               <span className="text-white/60 text-sm">Guests:</span>
               <select
-                value={customGuestCount}
+                value={guestCount}
                 onChange={(e) => {
-                  const val = e.target.value;
-                  setCustomGuestCount(val);
-                  if (val !== "custom") {
-                    setGuestCount(Number(val));
-                  }
+                  setGuestCount(Number(e.target.value));
                 }}
                 className="bg-navy-light border border-white/20 text-white rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold"
               >
-                <option value="custom">Custom ({guestCount})</option>
+                <option disabled value={guestCount}>Select preset</option>
                 {GUEST_COUNTS.map((count) => (
                   <option key={count} value={count}>
-                    {count.toLocaleString()}
+                    {count.toLocaleString()} guests
                   </option>
                 ))}
               </select>
             </div>
-            {customGuestCount === "custom" && (
-              <div className="w-full sm:w-64 space-y-1">
-                <div className="flex items-center justify-between">
-                  <span className="text-white/40 text-xs">10</span>
-                  <span className="text-gold font-bold text-sm">{guestCount} guests</span>
-                  <span className="text-white/40 text-xs">5,000</span>
-                </div>
-                <input
-                  type="range"
-                  min={10}
-                  max={5000}
-                  step={10}
-                  value={guestCount}
-                  onChange={(e) => setGuestCount(Number(e.target.value))}
-                  className="w-full h-2 rounded-full appearance-none cursor-pointer accent-gold bg-white/20"
-                  style={{
-                    background: `linear-gradient(to right, #D4A853 ${((guestCount - 10) / 4990) * 100}%, rgba(255,255,255,0.2) ${((guestCount - 10) / 4990) * 100}%)`,
-                  }}
-                />
+            <div className="w-full sm:w-72 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-white/40 text-xs">10</span>
+                <span className="text-gold font-bold text-lg">{guestCount.toLocaleString()} guests</span>
+                <span className="text-white/40 text-xs">5,000</span>
               </div>
-            )}
+              <input
+                type="range"
+                min={10}
+                max={5000}
+                step={10}
+                value={guestCount}
+                onChange={(e) => setGuestCount(Number(e.target.value))}
+                className="w-full h-2 rounded-full appearance-none cursor-pointer"
+                style={{
+                  background: `linear-gradient(to right, #D4A853 ${((guestCount - 10) / 4990) * 100}%, rgba(255,255,255,0.15) ${((guestCount - 10) / 4990) * 100}%)`,
+                }}
+              />
+            </div>
           </div>
         </div>
 
